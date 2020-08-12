@@ -23,7 +23,9 @@ before moving MTG in openalea.container.
 This module provides an implementation of a rooted tree graph.
 For interface definition, see :mod:`openalea.container.interface.tree`.
 '''
+from __future__ import absolute_import
 
+from builtins import object
 __docformat__ = "restructuredtext"
 __license__ = "Cecill-C"
 __revision__ = " $Id$ "
@@ -31,7 +33,7 @@ __revision__ = " $Id$ "
 #from interface.tree import ITree, IMutableTree, IEditableTree
 #from interface.graph import IRootedGraph, InvalidVertex, InvalidEdge
 #from traversal.tree import pre_order, post_order
-from traversal import *
+from .traversal import *
 
 class GraphError(Exception):
     """
@@ -85,7 +87,7 @@ class Tree(object):
         '''
         :returns: iter of vertex_id
         '''
-        return self._parent.iterkeys()
+        return iter(self._parent.keys())
 
     def vertices(self):
         '''
@@ -126,7 +128,7 @@ class Tree(object):
         """
         Iter on the edges of the tree.
         """
-        return ((parent, child) for child, parent in self._parent.iteritems())
+        return ((parent, child) for child, parent in self._parent.items())
 
     #########################################################################
     # MutableVertexGraphConcept methods.
@@ -373,7 +375,7 @@ class Tree(object):
             None
         '''
         if new_parent_id not in self:
-            raise ""
+            raise ("")
 
         old_parent = self.parent(vtx_id)
 
@@ -431,7 +433,7 @@ class Tree(object):
             treeid_id[vtx_id] = tree.root
             subtree = pre_order(self, vtx_id)
             
-            subtree.next()
+            next(subtree)
             for vid in subtree:
                 parent = treeid_id[self.parent(vid)]
                 v = tree.add_child(parent)
@@ -634,7 +636,7 @@ class PropertyTree(Tree):
             treeid_id[vtx_id] = tree.root
             tree._add_vertex_properties(tree.root, self.get_vertex_property(vtx_id))
             subtree = pre_order(self, vtx_id)
-            subtree.next()
+            next(subtree)
             for vid in subtree:
                 pid = self.parent(vid)
                 if pid is not None:
@@ -657,7 +659,7 @@ class PropertyTree(Tree):
         :param tree: a rooted tree
         """
         treeid_id = super(PropertyTree, self).insert_sibling_tree(vid, tree)
-        for tid, vid in treeid_id.iteritems():
+        for tid, vid in treeid_id.items():
             for name in tree.properties():
                 v = tree.property(name).get(tid)
                 if v is not None:
@@ -675,7 +677,7 @@ class PropertyTree(Tree):
         :param tree: a rooted tree
         """
         treeid_id = super(PropertyTree, self).add_child_tree(parent, tree)
-        for tid, vid in treeid_id.iteritems():
+        for tid, vid in treeid_id.items():
             for name in tree.properties():
                 v = tree.property(name).get(tid)
                 if v is not None:
@@ -704,7 +706,7 @@ class PropertyTree(Tree):
         Properties are defined only on vertices, even edge properties.
         return iter of names
         '''
-        return self._properties.keys()
+        return list(self._properties.keys())
 
     def property_names_iter(self):
         '''
@@ -712,7 +714,7 @@ class PropertyTree(Tree):
         Properties are defined only on vertices, even edge properties.
         return iter of names
         '''
-        return self._properties.iterkeys()
+        return iter(self._properties.keys())
 
     def property(self, name):
         '''

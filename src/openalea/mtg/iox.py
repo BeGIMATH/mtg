@@ -14,13 +14,15 @@
 #
 ################################################################################
 """This module provides functions to read / write mtg data structure."""
+from __future__ import absolute_import
 
 
-from mtg import *
+from builtins import str
+from .mtg import *
 from tulip import *
 tlp.initTulipLib()
 tlp.loadPlugins()
-from traversal import iter_mtg, iter_mtg_with_filter
+from .traversal import iter_mtg, iter_mtg_with_filter
 
 
 

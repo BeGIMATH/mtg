@@ -16,6 +16,7 @@
 ################################################################################
 """Tree  and MTG Traversals"""
 
+from builtins import object
 from collections import deque
 
 def pre_order(tree, vtx_id, complex=None, visitor_filter=None):

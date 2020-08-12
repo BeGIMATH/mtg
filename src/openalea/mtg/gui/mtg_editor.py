@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import print_function
 # -*- python -*-
 #
 #       Template grapheditor definitions for MTG Edition.
@@ -14,6 +16,8 @@
 #
 ###############################################################################
 
+from builtins import str
+from past.utils import old_div
 __license__ = "Cecill-C"
 __revision__ = " $Id$ "
 
@@ -45,7 +49,7 @@ class ObservedVertex(Observed):
         self.notify_listeners(("metadata_changed", "position", pos))
 
     def notify_update(self, **kwargs):
-        for item in kwargs.iteritems():
+        for item in kwargs.items():
             self.notify_listeners(item)
 
         pos = self.g().node(self.vid).position
@@ -203,7 +207,7 @@ class Vertex( qt.DefaultGraphicalVertex ):
         self.setBrush(brush)
         self._label.setText(str(self.vertex().vid))
         self._label.setPos(self.boundingRect().center()- \
-                           self._label.boundingRect().bottomRight()/2)
+                           old_div(self._label.boundingRect().bottomRight(),2))
 
         # -- call to parent handles the position --
         qt.DefaultGraphicalVertex.initialise_from_model(self)
@@ -249,7 +253,7 @@ class Vertex( qt.DefaultGraphicalVertex ):
         elif edge_type == "+":
             children = algo.sons(self.mtg, self.vertex().vid, EdgeType="+")
             n = len(children)
-            n = n if n < 60/30 else n+1
+            n = n if n < old_div(60,30) else n+1
             angle = -60 + n*30
             x += sin(radians(angle))*80
         elif edge_type == "/":
@@ -375,7 +379,7 @@ def initialise_graph_view_from_model(graphView, graphModel):
     """
     g = graphModel.graph
     gm = graphModel
-    print g, gm
+    print(g, gm)
     for v in g:
         if v is not g.root:
             gm.notify_listeners(("vertex_added", ("vertex", gm.vid2obj(v))))

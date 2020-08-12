@@ -24,6 +24,7 @@ Interface to use the new MTG implementation with the old AMAPmod interface.
     from openalea.mtg  import MTG
 
 """
+from builtins import str
 __docformat__ = "restructuredtext"
 
 import openalea.mtg.mtg as mtg

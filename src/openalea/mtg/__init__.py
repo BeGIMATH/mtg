@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # {# pkglts, base
 
 from . import version
@@ -5,10 +6,10 @@ from . import version
 __version__ = version.__version__
 
 # #}
-from mtg import *
+from .mtg import *
 
 try:
-    from plantframe import turtle, frame, plantframe, dresser
+    from .plantframe import turtle, frame, plantframe, dresser
 
     DressingData = dresser.DressingData
     PlantFrame = plantframe.PlantFrame

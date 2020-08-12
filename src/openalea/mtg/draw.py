@@ -26,7 +26,11 @@ See Also
 matplotlib: http://matplotlib.sourceforge.net/
 
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from past.utils import old_div
 from openalea.mtg import layout
 
 def draw(g, pos=None, ax=None, hold=None, ax_size=(0,0,1,1), **kwds):
@@ -726,7 +730,7 @@ def draw_mtg_labels(G, pos,
     verticalalignment=kwds.get('verticalalignment','center')
 
     text_items={}  # there is no text collection so we'll fake one
-    for n, label in labels.items():
+    for n, label in list(labels.items()):
         (x,y)=pos[n]
         if not cb.is_string_like(label):
             label=str(label) # this will cause "1" and 1 to be labeled the same
@@ -834,14 +838,14 @@ def draw_mtg_edge_labels(G, pos,
     else:
         labels = edge_labels
     text_items={}
-    for (n1,n2), label in labels.items():
+    for (n1,n2), label in list(labels.items()):
         (x1,y1)=pos[n1]
         (x2,y2)=pos[n2]
         (x,y) = (x1 * label_pos + x2 * (1.0 - label_pos),
                  y1 * label_pos + y2 * (1.0 - label_pos))
 
         if rotate:
-            angle=numpy.arctan2(y2-y1,x2-x1)/(2.0*numpy.pi)*360 # degrees
+            angle=old_div(numpy.arctan2(y2-y1,x2-x1),(2.0*numpy.pi))*360 # degrees
             # make label orientation "right-side-up"
             if angle > 90:
                 angle-=180

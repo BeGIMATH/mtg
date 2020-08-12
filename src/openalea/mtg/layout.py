@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 # -*- python -*-
 #
 #       OpenAlea.mtg
@@ -14,7 +16,10 @@
 #
 ###############################################################################
 
-import traversal, matrix
+from builtins import zip
+from builtins import range
+from past.utils import old_div
+from . import traversal, matrix
 from random import random
 
 def layout2d(g, vid=None, origin=(0,0), steps=(4,8), property_name='position'):
@@ -44,7 +49,7 @@ def layout2d(g, vid=None, origin=(0,0), steps=(4,8), property_name='position'):
     if vid is None:
         vid = g.root
         if hasattr(g, 'max_scale'):
-            vid = g.component_roots_at_scale_iter(g.root, g.max_scale()).next()
+            vid = next(g.component_roots_at_scale_iter(g.root, g.max_scale()))
 
 	# Algorithm
 	# 1. the y is defined by the Height of a node
@@ -54,7 +59,7 @@ def layout2d(g, vid=None, origin=(0,0), steps=(4,8), property_name='position'):
 
     y= {}
     vtxs = traversal.pre_order2(g,vid)
-    vtxs.next()
+    next(vtxs)
     y[vid] = origin[1]
     for v in vtxs:
         y[v] = y[g.parent(v)]+y_step
@@ -84,8 +89,8 @@ def layout2d(g, vid=None, origin=(0,0), steps=(4,8), property_name='position'):
         for cid in successor:
             _x = x[cid] = x[v]
             width = bbox[cid]
-            _min = _x-max(1,width/2)-x_step
-            _max = _x+max(1,width/2)+x_step
+            _min = _x-max(1,old_div(width,2))-x_step
+            _max = _x+max(1,old_div(width,2))+x_step
 
         weights = [bbox[rid] for rid in ramifs]
 
@@ -110,11 +115,11 @@ def layout2d(g, vid=None, origin=(0,0), steps=(4,8), property_name='position'):
         n = mean_ind(weights)
         for rid in reversed(ramifs[:n]):
             width = bbox[rid]
-            x[rid] = _min - max(1,width/2)
+            x[rid] = _min - max(1,old_div(width,2))
             _min -= width
         for rid in ramifs[n:]:
             width = bbox[rid]
-            x[rid] = _max + max(1,width/2)
+            x[rid] = _max + max(1,old_div(width,2))
             _max += width
 
 	# TODO: The tree s not well proportionned because we impose a constraint that the
@@ -174,7 +179,7 @@ def simple_layout(g, vid=None, origin=(0,0), steps=(4,8), property_name='positio
                 else:
                     plus.append(v)
             n = len(plus)
-            i = n/2
+            i = old_div(n,2)
             if n%2!=0:
                 left = int(random()<0.5)
                 i += left
@@ -203,7 +208,7 @@ def simple_layout(g, vid=None, origin=(0,0), steps=(4,8), property_name='positio
     if vid is None:
         vid = g.root
         if hasattr(g, 'max_scale'):
-            vid = g.component_roots_at_scale_iter(g.root, g.max_scale()).next()
+            vid = next(g.component_roots_at_scale_iter(g.root, g.max_scale()))
 
     # Algorithm
     # 1. the y is defined by the Height of a node
@@ -212,7 +217,7 @@ def simple_layout(g, vid=None, origin=(0,0), steps=(4,8), property_name='positio
     x_step, y_step = steps
     y= {}
     vtxs = traversal.pre_order2(g,vid)
-    vtxs.next()
+    next(vtxs)
     y[vid] = origin[1]
     for v in vtxs:
         y[v] = y[g.parent(v)]+y_step
@@ -255,7 +260,7 @@ def simple_layout(g, vid=None, origin=(0,0), steps=(4,8), property_name='positio
             v_root = g.complex_at_scale(vid, scale=s)
             vtxs = traversal.pre_order2(g, v_root)
             for v in vtxs:
-                comp_id = g.component_roots_at_scale_iter(v, scale=max_scale).next()
+                comp_id = next(g.component_roots_at_scale_iter(v, scale=max_scale))
                 position[v] = position[comp_id]
 
     g.properties()[property_name] = position
@@ -325,7 +330,7 @@ def fruchterman_reingold_layout(g,dim=2,k=None,
     max_scale = g.max_scale()
     vertexlist = g.vertices(scale=max_scale)
     if fixed is not None:
-        nfixed=dict(zip(vertexlist,range(len(vertexlist))))
+        nfixed=dict(list(zip(vertexlist,list(range(len(vertexlist))))))
         fixed=np.asarray([nfixed[v] for v in fixed])
 
     if pos is not None:
@@ -352,7 +357,7 @@ def fruchterman_reingold_layout(g,dim=2,k=None,
         pos=_fruchterman_reingold(A,dim,k,pos_arr,fixed,iterations)
     if fixed is None:
         pos=_rescale_layout(pos,scale=scale)
-    return dict(zip(vertexlist,pos))
+    return dict(list(zip(vertexlist,pos)))
 
 spring_layout=fruchterman_reingold_layout
 
@@ -403,12 +408,12 @@ def _fruchterman_reingold(A, dim=2, k=None, pos=None, fixed=None,
         distance=np.where(distance<0.01,0.01,distance)
         # displacement "force"
         displacement=np.transpose(np.transpose(delta)*\
-                                  (k*k/distance**2-A*distance/k))\
+                                  (old_div(k*k,distance**2)-old_div(A*distance,k)))\
                                   .sum(axis=1)
         # update positions
         length=np.sqrt((displacement**2).sum(axis=1))
         length=np.where(length<0.01,0.1,length)
-        delta_pos=np.transpose(np.transpose(displacement)*t/length)
+        delta_pos=np.transpose(old_div(np.transpose(displacement)*t,length))
         if fixed is not None:
             # don't change positions of fixed nodes
             delta_pos[fixed]=0.0
@@ -481,11 +486,11 @@ def _sparse_fruchterman_reingold(A, dim=2, k=None, pos=None, fixed=None,
             Ai=np.asarray(A.getrowview(i).toarray())
             # displacement "force"
             displacement[:,i]+=\
-                (delta*(k*k/distance**2-Ai*distance/k)).sum(axis=1)
+                (delta*(old_div(k*k,distance**2)-old_div(Ai*distance,k))).sum(axis=1)
         # update positions
         length=np.sqrt((displacement**2).sum(axis=0))
         length=np.where(length<0.01,0.1,length)
-        pos+=(displacement*t/length).T
+        pos+=(old_div(displacement*t,length)).T
         # cool temperature
         t-=dt
         pos=_rescale_layout(pos)
@@ -501,5 +506,5 @@ def _rescale_layout(pos,scale=1):
         lim=max(pos[:,i].max(),lim)
     # rescale to (0,scale) in all directions, preserves aspect
     for i in range(pos.shape[1]):
-        pos[:,i]*=scale/lim
+        pos[:,i]*=old_div(scale,lim)
     return pos

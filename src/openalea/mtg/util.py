@@ -17,7 +17,10 @@
 '''
 Different utilities such as plot2D, plot3D, and so on...
 '''
+from __future__ import print_function
 
+from builtins import next
+from builtins import str
 from openalea.mtg import *
 from openalea.mtg.traversal import *
 
@@ -34,7 +37,7 @@ def mtg_plot(g, scales=1):
     scale = g._scale
 
     for s in uniq_scales:
-        print s
+        print(s)
 
 
     #cluster2 = pydot.Cluster('U2')
@@ -99,7 +102,7 @@ def plot3d( g, scale=None ):
     edges = {}
     edge_type = g.property('edge_type')
 
-    root_id = g.roots_iter(scale=scale).next()
+    root_id = next(g.roots_iter(scale=scale))
     for vid in pre_order(g, root_id):
         parent = g.parent(vid)
         if parent is None:

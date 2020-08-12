@@ -38,7 +38,11 @@ the geometric interpretation of a MTG (i.e. PlantFrame)
     >>> Plot(pf) #doctest: +SKIP
 
 '''
+from __future__ import division
+from __future__ import print_function
 
+from builtins import object
+from past.utils import old_div
 from math import pi
 import os
 from openalea.plantgl.scenegraph import AmapSymbol
@@ -128,8 +132,8 @@ class DressingData(object):
         self.fruit_class = kwds.get('FruitClass')
         self.length_unit = kwds.get('LengthUnit',1)
         self.diameter_unit = kwds.get('DiameterUnit',1)
-        self.azimuth_unit = kwds.get('AzimuthUnit', 180/pi)
-        self.alpha_unit = kwds.get('AlphaUnit', 180/pi)
+        self.azimuth_unit = kwds.get('AzimuthUnit', old_div(180,pi))
+        self.alpha_unit = kwds.get('AlphaUnit', old_div(180,pi))
 
         self.default_edge = kwds.get('DefaultEdge')
 
@@ -200,7 +204,7 @@ def dressing_data(file):
             continue
         else: 
             status = grammar.parse(l, line)
-    print '\n'.join(grammar.errors)
+    print('\n'.join(grammar.errors))
     return dresser
 
 ###############################################################
